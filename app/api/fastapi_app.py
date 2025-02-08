@@ -81,11 +81,17 @@ async def handle_query(request: QueryRequest):
     """
     query = request.query
 
+    # Check Notion for existing answers
+    notion_link = notion_manager.search_notion(query)
+    if notion_link:
+        logger.info(f"Answer already exists in Notion: {notion_link}")
+
+        return {
+            "answer": f"Answer already exists in Notion: {notion_link}"
+        }
+
     # RAG pipeline
     query_embed = embedding_model.embed_query(query)
-    # # Notion check
-    # duplicates = notion_integration.NotionChecker().check_duplicates(query)
-
     results = vector_store.query(query_embed, n_results=10)
     documents = results["documents"][0]
     distances = results["distances"][0]
@@ -95,12 +101,14 @@ async def handle_query(request: QueryRequest):
     response_generator = generation.ResponseGenerator()
     answer = response_generator.generate_response(query, retrieved_chunks)
 
-    # Create a Notion page with the response
-    notion_manager.create_notion_page(answer)
+    # Step 3: Store answer in Notion
+    notion_link = notion_manager.create_notion_page(query, answer)
+    logger.info(f"Answer generated and stored in Notion: {notion_link}")
+
     
     return {
         # "results": results,
-        "answer": answer
+        "answer": answer + '\n\n' + f"Answer stored in Notion: {notion_link}"
     }
 
 @router.get("/count")

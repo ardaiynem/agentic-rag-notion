@@ -8,7 +8,7 @@ class NotionManager:
         self.notion = Client(auth=settings.notion_api_key, log_level=logging.DEBUG)
         self.database_id = settings.notion_database_id
 
-    def create_notion_page(self, response_text: str) -> dict:
+    def create_notion_page(self, question_text: str, response_text: str) -> dict:
         """
         Create a new Notion page with the given RAG response text, splitting into chunks to adhere to Notion's text limits.
         """
@@ -42,7 +42,7 @@ class NotionManager:
                     "title": [
                         {
                             "text": {
-                                "content": "RAG Response"
+                                "content": f"Q: {question_text}"
                             }
                         }
                     ]
@@ -50,3 +50,15 @@ class NotionManager:
             },
             children=children_blocks
         )
+
+    def search_notion(self, question):
+        """
+        Search Notion for existing answers.
+        """
+        query = self.notion.search(query=question, filter={"property": "object", "value": "page"}).get("results", [])
+        # for page in query:
+        #     page_content = self.notion.blocks.children.list(page["id"]).get("results", [])
+        #     if question.lower() in page_content.lower():
+        #         return page["url"]  # Return the link if the question exists
+        if query:
+            return query[0]["url"]
