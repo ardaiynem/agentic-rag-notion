@@ -1,0 +1,17 @@
+langchain==0.3.18
+langchain-core==0.3.34
+langchain-community==0.3.17
+pypdf==5.2.0
+sentence-transformers==3.4.1
+chromadb==0.6.3
+fastapi==0.115.8
+uvicorn==0.34.0
+notion-client==2.3.0
+requests==2.32.3
+python-dotenv==1.0.1
+pandas==2.2.3
+pydantic-settings==2.7.1
+pydantic==2.10.6
+python-multipart==0.0.20
+openai==1.61.1
+tiktoken==0.8.0

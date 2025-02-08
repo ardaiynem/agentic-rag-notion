@@ -1,0 +1,27 @@
+services:
+  chromadb:
+    image: chromadb/chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+    environment:
+      - ALLOW_RESET=TRUE
+      # - CHROMA_SERVER_AUTHN_CREDENTIALS=admin:admin
+      # - CHROMA_SERVER_AUTHN_PROVIDER=token
+
+  rag-app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - NOTION_API_KEY=${NOTION_API_KEY}
+      - NOTION_DATABASE_ID=${NOTION_DATABASE_ID}
+      - CHROMA_HOST=chromadb
+      - CHROMA_PORT=8000
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - chromadb
+
+volumes:
+  chroma_data:
