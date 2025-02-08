@@ -11,7 +11,7 @@ class ResponseGenerator:
         self,
         query: str,
         chunks: list[dict],
-        model: str = "gpt-4",
+        model: str = "gpt-4o",
         max_context_tokens: int = 4096,
         temperature: float = 0.7
     ) -> str:
