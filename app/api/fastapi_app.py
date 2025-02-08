@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile
 from app.main import app
 from pydantic import BaseModel
 from app.utils import loader, text_splitter
-from app.embeddings.embedding import SentenceTransformerModel
+from app.embeddings.embedding import SentenceTransformerModel, OpenAIEmbeddingModel
 from app.database import chroma_manager, notion_integration
 from app.generation import generation
 import os
@@ -10,7 +10,8 @@ import logging
 
 router = APIRouter()
 vector_store = chroma_manager.ChromaManager()
-embedding_model = SentenceTransformerModel()
+# embedding_model = SentenceTransformerModel()
+embedding_model = OpenAIEmbeddingModel(model_name="text-embedding-3-small")
 
 # Configure the logger
 logging.basicConfig(level=logging.INFO)
