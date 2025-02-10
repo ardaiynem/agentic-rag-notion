@@ -82,3 +82,13 @@ class SentenceTransformerModel(EmbeddingModel):
     
     def embed_query(self, text: str) -> list[float]:
         return self.model.encode([text])[0]
+    
+# class CrossEncoderModel(EmbeddingModel):
+#     def __init__(self):
+#         self.model = SentenceTransformer(settings.cross_encoder_model)
+    
+#     def embed_documents(self, texts: list[str]) -> list[list[float]]:
+#         return self.model.encode(texts)
+    
+#     def embed_query(self, text: str) -> list[float]:
+#         return self.model.encode([text])[0]

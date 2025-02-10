@@ -1,6 +1,7 @@
 import chromadb
 from chromadb.config import Settings
 from config.settings import settings
+from chromadb.utils import embedding_functions
 
 class ChromaManager:
     def __init__(self):
@@ -11,10 +12,40 @@ class ChromaManager:
                 chroma_api_impl="chromadb.api.fastapi.FastAPI",
             )
         )
+
+        # Create a collection for documents
         self.collection = self.client.get_or_create_collection(
             name="documents",
             metadata={"hnsw:space": "cosine"}
         )
+
+        # Create collections for questions and answers
+        self.embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(
+            model_name="all-MiniLM-L6-v2",
+        )
+        
+        self.question_collection = self.client.get_or_create_collection(
+            name="questions",
+            embedding_function=self.embedding_func,
+            metadata={"hnsw:space": "cosine"}
+        )
+        
+        self.answer_collection = self.client.get_or_create_collection(
+            name="answers",
+            embedding_function=self.embedding_func,
+            metadata={"hnsw:space": "cosine"}
+        )
+
+    def get_collection(self, name):
+        """
+        Returns a collection by name.
+
+        Args:
+            name: Name of the collection.
+        Returns:
+            Collection object.
+        """
+        return self.client.get_collection(name)
 
     def add(self, documents, embeddings, ids):
         """
@@ -62,7 +93,7 @@ class ChromaManager:
         Returns:
             Number of documents.
         """
-        return self.collection.count()
+        return [self.collection.count(), self.question_collection.count(), self.answer_collection.count()]
     
     def peek(self, n=5):
         """

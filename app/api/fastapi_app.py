@@ -7,11 +7,15 @@ from app.database import chroma_manager, notion_integration
 from app.generation import generation
 import os
 import logging
+from app.database import notion_integration
+from app.rag.rag_pipeline import RAGPipeline
 
 router = APIRouter()
 vector_store = chroma_manager.ChromaManager()
 # embedding_model = SentenceTransformerModel()
 embedding_model = OpenAIEmbeddingModel(model_name="text-embedding-3-small")
+response_generator = generation.ResponseGenerator()
+# notion_manager = notion_integration.NotionManager()
 
 # Configure the logger
 logging.basicConfig(level=logging.INFO)
@@ -79,24 +83,11 @@ async def handle_query(request: QueryRequest):
     """
     query = request.query
 
-    # RAG pipeline
-    query_embed = embedding_model.embed_query(query)
-    # # Notion check
-    # duplicates = notion_integration.NotionChecker().check_duplicates(query)
+    rag_pipeline = RAGPipeline(embedding_model=embedding_model, vector_store=vector_store, response_generator=response_generator)
 
-    results = vector_store.query(query_embed, n_results=10)
-    documents = results["documents"][0]
-    distances = results["distances"][0]
-    retrieved_chunks = [{"text": documents[i], "distance": distances[i]} for i in range(len(documents))]
-    
-    # Generate response using RAG pipeline
-    response_generator = generation.ResponseGenerator()
-    answer = response_generator.generate_response(query, retrieved_chunks)
-    
-    return {
-        # "results": results,
-        "answer": answer
-    }
+    # RAG pipeline
+    result = rag_pipeline.process_query(query, None)
+    return result
 
 @router.get("/count")
 async def get_count():
