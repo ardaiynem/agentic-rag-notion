@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Interface</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 flex flex-col items-center justify-center min-h-screen">
+    <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-md">
+        <h1 class="text-2xl font-bold mb-4 text-center">Chatbot</h1>
+        <div id="chatDisplay" class="border border-gray-300 rounded-lg p-4 h-64 overflow-y-auto mb-4"></div>
+        <input id="queryInput" type="text" placeholder="Type your query..." class="border border-gray-300 rounded-lg p-2 w-full mb-2">
+        <button id="queryButton" class="bg-blue-500 text-white rounded-lg p-2 w-full mb-2">Send Query</button>
+        <input id="fileInput" type="file" class="mb-2">
+        <button id="uploadButton" class="bg-green-500 text-white rounded-lg p-2 w-full mb-2">Upload File</button>
+        <button id="statsButton" class="bg-yellow-500 text-white rounded-lg p-2 w-full">Show Stats</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
