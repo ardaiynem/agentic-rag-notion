@@ -15,3 +15,4 @@ pydantic==2.10.6
 python-multipart==0.0.20
 openai==1.61.1
 tiktoken==0.8.0
+smolagents

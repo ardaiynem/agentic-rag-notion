@@ -62,3 +62,9 @@ class NotionManager:
         #         return page["url"]  # Return the link if the question exists
         if query:
             return query[0]["url"]
+        
+    def get_notion_client(self):
+        return self.notion
+    
+    def get_database_id(self):
+        return self.database_id

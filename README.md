@@ -7,8 +7,11 @@ This project demonstrates a Retrieval-Augmented Generation (RAG) pipeline using 
 - [x] Implement FastAPI for serving a REST API
 - [x] Implement Sentence Transformers for embedding and semantic search
 - [x] Implement RAG pipeline for document retrieval and response generation
-- [ ] Implement Notion integration for creating Notion files from uploaded documents and questions about them
-- [ ] Implement functionality for detecting duplicate questions for avoiding redundant Notion file creation
+- [x] Implement Notion integration for creating Notion files from uploaded documents and questions about them
+- [x] Implement functionality for detecting duplicate questions for avoiding redundant Notion file creation
+- [ ] Implement LLM agent for generating structured notion files (from markdown to notion maybe) and a self evaluation mechanism after content generation
+- [ ] Implement a frontend (ChatBot UI) for the API
+- [ ] Implement reranking of retrieved documents based on the query with cross-encoding
 
 ## Features
 - **ChromaDB** for vector storage and retrieval  

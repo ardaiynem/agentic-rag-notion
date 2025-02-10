@@ -8,12 +8,14 @@ from app.generation import generation
 import os
 import logging
 from app.database import notion_integration
+from app.rag.rag_pipeline import RAGPipeline
 
 router = APIRouter()
 vector_store = chroma_manager.ChromaManager()
 # embedding_model = SentenceTransformerModel()
 embedding_model = OpenAIEmbeddingModel(model_name="text-embedding-3-small")
-notion_manager = notion_integration.NotionManager()
+response_generator = generation.ResponseGenerator()
+# notion_manager = notion_integration.NotionManager()
 
 # Configure the logger
 logging.basicConfig(level=logging.INFO)
@@ -81,35 +83,11 @@ async def handle_query(request: QueryRequest):
     """
     query = request.query
 
-    # Check Notion for existing answers
-    notion_link = notion_manager.search_notion(query)
-    if notion_link:
-        logger.info(f"Answer already exists in Notion: {notion_link}")
-
-        return {
-            "answer": f"Answer already exists in Notion: {notion_link}"
-        }
+    rag_pipeline = RAGPipeline(embedding_model=embedding_model, vector_store=vector_store, response_generator=response_generator)
 
     # RAG pipeline
-    query_embed = embedding_model.embed_query(query)
-    results = vector_store.query(query_embed, n_results=10)
-    documents = results["documents"][0]
-    distances = results["distances"][0]
-    retrieved_chunks = [{"text": documents[i], "distance": distances[i]} for i in range(len(documents))]
-    
-    # Generate response using RAG pipeline
-    response_generator = generation.ResponseGenerator()
-    answer = response_generator.generate_response(query, retrieved_chunks)
-
-    # Step 3: Store answer in Notion
-    notion_link = notion_manager.create_notion_page(query, answer)
-    logger.info(f"Answer generated and stored in Notion: {notion_link}")
-
-    
-    return {
-        # "results": results,
-        "answer": answer + '\n\n' + f"Answer stored in Notion: {notion_link}"
-    }
+    result = rag_pipeline.process_query(query, None)
+    return result
 
 @router.get("/count")
 async def get_count():
