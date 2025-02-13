@@ -86,7 +86,8 @@ async def handle_query(request: QueryRequest):
     rag_pipeline = RAGPipeline(embedding_model=embedding_model, vector_store=vector_store, response_generator=response_generator)
 
     # RAG pipeline
-    result = rag_pipeline.process_query(query, None)
+    # result = rag_pipeline.process_query(query, None)
+    result = rag_pipeline.agentic_rag(query, None)
     return result
 
 @router.get("/count")

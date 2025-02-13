@@ -1,12 +1,20 @@
 import logging
-import os
 from notion_client import Client
 from config.settings import settings
 
 class NotionManager:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(NotionManager, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self):
-        self.notion = Client(auth=settings.notion_api_key, log_level=logging.DEBUG)
-        self.database_id = settings.notion_database_id
+        if not hasattr(self, 'initialized'):  # Ensure __init__ is only called once
+            self.notion = Client(auth=settings.notion_api_key, log_level=logging.DEBUG)
+            self.database_id = settings.notion_database_id
+            self.initialized = True
 
     def create_notion_page(self, question_text: str, response_text: str) -> dict:
         """
@@ -56,10 +64,6 @@ class NotionManager:
         Search Notion for existing answers.
         """
         query = self.notion.search(query=question, filter={"property": "object", "value": "page"}).get("results", [])
-        # for page in query:
-        #     page_content = self.notion.blocks.children.list(page["id"]).get("results", [])
-        #     if question.lower() in page_content.lower():
-        #         return page["url"]  # Return the link if the question exists
         if query:
             return query[0]["url"]
         

@@ -29,12 +29,22 @@ class EmbeddingModel(ABC):
             Embedding vector as a list of floats.
         """
         pass
+    
+class OpenAIEmbeddingModel(EmbeddingModel):
+    _instance = None
 
-class OpenAIEmbeddingModel:
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self, model_name: str = "text-embedding-3-small"):
-        self.model_name = model_name
-        self.client = OpenAI(api_key=settings.openai_api_key)
-        self.api_tpm_limit = 1000000  # Max tokens per minute (TPM) limit
+        if not hasattr(self, 'initialized'):  # Ensure __init__ is only called once
+            self.model_name = model_name
+            self.client = OpenAI(api_key=settings.openai_api_key)
+            self.api_tpm_limit = 1000000  # Max tokens per minute (TPM) limit
+            self.initialized = True
+
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         try:
             # Split texts into smaller chunks
@@ -62,12 +72,20 @@ class OpenAIEmbeddingModel:
 
     def embed_query(self, text: str) -> list[float]:
         return self.embed_documents([text])[0]
-
+    
 class SentenceTransformerModel(EmbeddingModel):
-    def __init__(self):
-        self.model = SentenceTransformer(settings.embedding_model)
-        # self.model.max_seq_length = 512  # Optimize for chunk size
+    _instance = None
 
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self):
+        if not hasattr(self, 'initialized'):  # Ensure __init__ is only called once
+            self.model = SentenceTransformer(settings.embedding_model)
+            # self.model.max_seq_length = 512  # Optimize for chunk size
+            self.initialized = True
     
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         return self.model.encode(texts)

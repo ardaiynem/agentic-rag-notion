@@ -4,37 +4,46 @@ from config.settings import settings
 from chromadb.utils import embedding_functions
 
 class ChromaManager:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(ChromaManager, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self):
-        self.client = chromadb.HttpClient(
-            host=settings.chroma_host,
-            port=settings.chroma_port,
-            settings=Settings(
-                chroma_api_impl="chromadb.api.fastapi.FastAPI",
+        if not hasattr(self, 'initialized'):  # Ensure __init__ is only called once
+            self.client = chromadb.HttpClient(
+                host=settings.chroma_host,
+                port=settings.chroma_port,
+                settings=Settings(
+                    chroma_api_impl="chromadb.api.fastapi.FastAPI",
+                )
             )
-        )
 
-        # Create a collection for documents
-        self.collection = self.client.get_or_create_collection(
-            name="documents",
-            metadata={"hnsw:space": "cosine"}
-        )
+            # Create a collection for documents
+            self.collection = self.client.get_or_create_collection(
+                name="documents",
+                metadata={"hnsw:space": "cosine"}
+            )
 
-        # Create collections for questions and answers
-        self.embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(
-            model_name="all-MiniLM-L6-v2",
-        )
-        
-        self.question_collection = self.client.get_or_create_collection(
-            name="questions",
-            embedding_function=self.embedding_func,
-            metadata={"hnsw:space": "cosine"}
-        )
-        
-        self.answer_collection = self.client.get_or_create_collection(
-            name="answers",
-            embedding_function=self.embedding_func,
-            metadata={"hnsw:space": "cosine"}
-        )
+            # Create collections for questions and answers
+            self.embedding_func = embedding_functions.SentenceTransformerEmbeddingFunction(
+                model_name="all-MiniLM-L6-v2",
+            )
+            
+            self.question_collection = self.client.get_or_create_collection(
+                name="questions",
+                embedding_function=self.embedding_func,
+                metadata={"hnsw:space": "cosine"}
+            )
+            
+            self.answer_collection = self.client.get_or_create_collection(
+                name="answers",
+                embedding_function=self.embedding_func,
+                metadata={"hnsw:space": "cosine"}
+            )
+            self.initialized = True
 
     def get_collection(self, name):
         """

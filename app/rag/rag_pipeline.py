@@ -1,3 +1,4 @@
+from app.agents.notion_agent import NotionRAGAgent
 from app.utils.duplicate_checker import DuplicateChecker
 # from app.agents.notion_agent import NotionPageAgent
 from app.database.notion_integration import NotionManager
@@ -94,3 +95,8 @@ class RAGPipeline:
             + "\n\n"
             + f"Answer stored in Notion: {notion_link}"
         }
+    
+    def agentic_rag(self, question, context):
+        notion_agent = NotionRAGAgent
+        result = notion_agent.process_query(question)
+        return result

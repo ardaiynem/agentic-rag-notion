@@ -1,11 +1,21 @@
+from app.database.chroma_manager import ChromaManager
 import numpy as np
 import hashlib
 
 class DuplicateChecker:
-    def __init__(self, chroma_client):
-        self.chroma_client = chroma_client
-        self.question_collection = self.chroma_client.get_collection("questions")
-        self.answer_collection = self.chroma_client.get_collection("answers")
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(DuplicateChecker, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
+    def __init__(self, chroma_client=None):
+        if not hasattr(self, 'initialized'):  # Ensure __init__ is only called once
+            self.chroma_client = chroma_client or ChromaManager()
+            self.question_collection = self.chroma_client.get_collection("questions")
+            self.answer_collection = self.chroma_client.get_collection("answers")
+            self.initialized = True
         
     def _check_for_duplicate(self, query, collection, threshold=0.85):
         """Check if a query is a duplicate in the specified collection and return the Notion link if found."""
