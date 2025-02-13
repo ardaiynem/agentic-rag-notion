@@ -459,10 +459,6 @@ class NotionRAGAgent:
         # Step 3: Validate and create Notion page
         creation_result = NotionRAGAgent.create_notion_page(content)
         logger.info(f"Page creation result: {creation_result}")
-        notion_link = notion_link["url"]
-
-        # Step 4: Store question & answer in Notion
-        NotionRAGAgent.duplicate_checker.add_entry(question, generated_markdown, notion_link)
         
         if creation_result.get("success"):
             return {

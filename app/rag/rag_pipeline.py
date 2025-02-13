@@ -8,44 +8,10 @@ from app.embeddings.embedding import OpenAIEmbeddingModel
 class RAGPipeline:
     def __init__(self, embedding_model, vector_store, response_generator):
         self.duplicate_checker = DuplicateChecker(vector_store)
-        # self.notion_agent = NotionPageAgent()
         self.notion_manager = NotionManager()
         self.vector_store = vector_store
         self.embedding_model = embedding_model
         self.response_generator = response_generator
-
-    # def process_query_agent(self, question, context):
-
-    #     # Step 1: Check for duplicates
-    #     is_duplicate, reason = self.duplicate_checker.check_duplicates(question)
-    #     if is_duplicate:
-    #         return f"Duplicate {reason} found - skipping generation"
-
-    #     # Step 2: Generate content
-    #     content = self.notion_agent.generate_content(context)
-
-    #     # Step 3: Validate content
-    #     validation = self.notion_agent.validate_structure(content)
-    #     if not validation["valid"]:
-    #         return f"Content validation failed: {validation['feedback']}"
-
-    #     # Step 4: Check answer duplicate
-    #     answer_str = str(content)
-    #     is_duplicate, reason = self.duplicate_checker.check_duplicates(
-    #         question, answer_str
-    #     )
-    #     if is_duplicate:
-    #         return f"Duplicate {reason} found - skipping creation"
-
-    #     # Step 5: Create Notion page
-    #     result = self.notion_agent.create_page(
-    #         self.notion_manager.get_database_id(), content
-    #     )
-
-    #     if result["success"]:
-    #         self.duplicate_checker.add_entry(question, answer_str)
-    #         return f"Page created successfully: {result['page_id']}"
-    #     return f"Page creation failed: {result['error']}"
 
     def process_query(self, question, context):
         # Step 1: Check for duplicates
